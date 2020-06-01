@@ -33,8 +33,21 @@ type Configs struct {
 
 type Config func(c *Configs)
 
+// NewDB 新建连接
 func NewDB(user, password, dbname string, configs ...Config) *gorm.DB {
 	return newDB(user, password, dbname, configs...)
+}
+
+func Host(h string) Config {
+	return func(c *Configs) {
+		c.Host = h
+	}
+}
+
+func Port(p int) Config {
+	return func(c *Configs) {
+		c.Port = p
+	}
 }
 
 func newConfigs(user, password, dbname string, configs ...Config) Configs {
