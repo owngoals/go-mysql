@@ -29,6 +29,7 @@ type Configs struct {
 	Timezone    string
 	MaxIdleConn int
 	MaxOpenConn int
+	LogMode     bool
 }
 
 type Config func(c *Configs)
@@ -50,6 +51,48 @@ func Port(p int) Config {
 	}
 }
 
+func Charset(s string) Config {
+	return func(c *Configs) {
+		c.Charset = s
+	}
+}
+
+func Collation(s string) Config {
+	return func(c *Configs) {
+		c.Collation = s
+	}
+}
+
+func Engine(s string) Config {
+	return func(c *Configs) {
+		c.Engine = s
+	}
+}
+
+func Timezone(s string) Config {
+	return func(c *Configs) {
+		c.Timezone = s
+	}
+}
+
+func MaxIdleConn(i int) Config {
+	return func(c *Configs) {
+		c.MaxIdleConn = i
+	}
+}
+
+func MaxOpenConn(i int) Config {
+	return func(c *Configs) {
+		c.MaxOpenConn = i
+	}
+}
+
+func LogMode(b bool) Config {
+	return func(c *Configs) {
+		c.LogMode = b
+	}
+}
+
 func newConfigs(user, password, dbname string, configs ...Config) Configs {
 	cnf := Configs{
 		Host:        DefaultHost,
@@ -63,6 +106,7 @@ func newConfigs(user, password, dbname string, configs ...Config) Configs {
 		Timezone:    DefaultTimezone,
 		MaxIdleConn: DefaultMaxIdleConn,
 		MaxOpenConn: DefaultMaxOpenConn,
+		LogMode:     false,
 	}
 
 	for _, c := range configs {
@@ -91,6 +135,7 @@ func newDB(user, password, dbname string, configs ...Config) *gorm.DB {
 	if err := db.DB().Ping(); err != nil {
 		panic(err)
 	}
+	db.LogMode(c.LogMode)
 	db.DB().SetMaxIdleConns(c.MaxIdleConn)
 	db.DB().SetMaxOpenConns(c.MaxOpenConn)
 	return db
